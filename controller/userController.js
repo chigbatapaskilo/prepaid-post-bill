@@ -66,4 +66,32 @@ let remainingUnit= owner.conversion-monthlyUsage
         res.status(500).json(error.message)
     }
 }
-module.exports={createUser,getOne,estimatedUsage}
+
+//payment
+const payBills=async(req,res)=>{
+    try {
+
+        const{meterNo,amount}=req.body  
+        const owner= await nepaModel.findOne({meterNo})
+
+        if(!owner){
+            return res.status(404).json("meter number does not exist")
+        }
+const calculateRate=parseFloat((amount/66.7).toFixed(2))
+
+console.log(owner.conversion)
+const remainingBalance=  (calculateRate) + (owner.conversion)
+
+
+
+
+
+      const payment=  await nepaModel.findOneAndUpdate({meterNo},{conversion:remainingBalance},{new:true})
+        res.status(200).json({message:`payment received kindly find your remaining balance below`,
+            data:payment.conversion
+        })
+    } catch (error) {
+       res.status(500).json(error.message) 
+    }
+}
+module.exports={createUser,getOne,estimatedUsage,payBills}
